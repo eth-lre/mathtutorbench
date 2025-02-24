@@ -1,0 +1,14 @@
+name: mistake_correction
+dataset_path: dataset/stepverify.json
+dataset_name: main
+training_split: train
+test_split: test
+system_prompt: "You are a helpful math tutor assisting a student. Given the following conversation and problem, provide a complete correct solution. Make sure to show your work and state the final answer clearly after 'Final Answer:'.
+\nProblem: {{question}}
+\nConversation:
+\n{{dialog_history}}
+\nStudent: {{student_chat_solution}}
+\nTeacher: "
+ground_truth_format: "{{ reference_solution.split('\n')[-1].replace(',', '').strip() }}"
+few_shot_samples: ""
+stop: ["Problem:", "Student:"]

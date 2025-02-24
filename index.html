@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathTutorBench - Benchmark for LLM Tutors</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        .sort-arrow {
+            display: inline-block;
+            width: 0;
+            height: 0;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        .sort-arrow.ascending {
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-bottom: 6px solid currentColor;
+        }
+        .sort-arrow.descending {
+            border-left: 4px solid transparent;
+            border-right: 4px solid transparent;
+            border-top: 6px solid currentColor;
+        }
+        .highlight {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        th {
+            cursor: pointer;
+            user-select: none;
+        }
+        .icon {
+            font-size: 1.25rem;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-blue-800 mb-4">MathTutorBench</h1>
+            <p class="text-xl text-gray-600 mb-6">A Benchmark for Measuring Open-ended Pedagogical Capabilities of LLM Tutors</p>
+            <div class="flex justify-center space-x-3 mb-6">
+                <a href="#" class="inline-flex items-center px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 transition">
+                    <span>Arxiv</span>
+                </a>
+                <a href="https://huggingface.co/eth-nlped/pedagogical-reward-model" class="inline-flex items-center px-3 py-1 bg-yellow-500 text-white rounded-md text-sm hover:bg-yellow-600 transition">
+                    <span class="icon mr-1">🤗</span> <span>Pedagogical Reward Model</span>
+                </a>
+                <a href="https://creativecommons.org/licenses/by/4.0/deed.en" class="inline-flex items-center px-3 py-1 bg-gray-500 text-white rounded-md text-sm hover:bg-gray-600 transition">
+                    <span>CC BY 4.0</span>
+                </a>
+                <a href="https://www.python.org/" class="inline-flex items-center px-3 py-1 bg-blue-600 text-white rounded-md text-sm hover:bg-blue-700 transition">
+                    <span>Python 3.12</span>
+                </a>
+            </div>
+        </header>
+
+        <!-- Overview Section -->
+        <section class="mb-12 bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-2xl font-bold text-blue-800 mb-4">Overview</h2>
+            <p class="text-gray-700 mb-6">
+                <strong>MathTutorBench</strong> is a benchmark which provides a unified framework for evaluating
+                open-ended pedagogical capabilities of large language models (LLMs) tutors across three high level
+                teacher skills and seven concrete tasks.
+            </p>
+
+            <div class="flex justify-center my-8">
+                <img src="./images/skills.png" alt="Skills Overview" class="max-w-md rounded-lg shadow-md">
+            </div>
+
+            <h3 class="text-xl font-semibold text-blue-800 mb-3">Key Features</h3>
+            <ul class="list-disc pl-6 text-gray-700 space-y-2 mb-6">
+                <li><strong>Automatic Evaluation:</strong> The benchmark is designed to be run automatically on any new models you are developing.</li>
+                <li><strong>Comprehensive Metrics:</strong> The benchmark covers three high level skills and seven tasks to evaluate in the domain of math tutoring.</li>
+                <li><strong>Teacher-Grounded Evaluation:</strong> Each task is annotated with teacher ground truths and compared to it.</li>
+                <li><strong>Fast execution loop:</strong> Run benchmark on different tasks very quickly.</li>
+            </ul>
+        </section>
+
+                <!-- Leaderboard Section -->
+        <section class="mb-12 bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-2xl font-bold text-blue-800 mb-4">Leaderboard</h2>
+            <p class="text-gray-700 mb-6">Click on any column header to sort the table by that metric.</p>
+
+            <div class="overflow-x-auto">
+                <table id="leaderboardTable" class="min-w-full bg-white border border-gray-200">
+                    <thead>
+                        <tr class="bg-gray-100">
+                            <th class="py-3 px-4 border-b border-gray-200 text-left" data-sort="model">Model <span class="sort-arrow"></span></th>
+                            <th class="py-3 px-4 border-b border-gray-200 text-center" data-sort="ps">Problem Solving <span class="sort-arrow"></span></th>
+                            <th class="py-3 px-4 border-b border-gray-200 text-center" data-sort="sq">Socratic Questioning <span class="sort-arrow"></span></th>
+                            <th class="py-3 px-4 border-b border-gray-200 text-center" data-sort="sc">Solution Correctness <span class="sort-arrow"></span></th>
+                            <th class="py-3 px-4 border-b border-gray-200 text-center" data-sort="ml">Mistake Location <span class="sort-arrow"></span></th>
+                            <th class="py-3 px-4 border-b border-gray-200 text-center" data-sort="mc">Mistake Correction <span class="sort-arrow"></span></th>
+                            <th class="py-3 px-4 border-b border-gray-200 text-center" data-sort="sw">Scaffolding Win Rate <span class="sort-arrow"></span></th>
+                            <th class="py-3 px-4 border-b border-gray-200 text-center" data-sort="pw">Pedagogy IF Win Rate <span class="sort-arrow"></span></th>
+                            <th class="py-3 px-4 border-b border-gray-200 text-center" data-sort="sh">Scaffolding (Hard) <span class="sort-arrow"></span></th>
+                            <th class="py-3 px-4 border-b border-gray-200 text-center" data-sort="ph">Pedagogy IF (Hard) <span class="sort-arrow"></span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="py-2 px-4 border-b border-gray-200 font-medium">LLaMA3.2-3B-Instruct</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.60</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.29</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.67</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.41</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.13</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center font-bold text-blue-700">0.64</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.63</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.45</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.40</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 px-4 border-b border-gray-200 font-medium">LLaMA3.1-8B-Instruct</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.70</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.29</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.63</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.29</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.09</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.61</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.67</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.46</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.49</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 px-4 border-b border-gray-200 font-medium">LLaMA3.1-70B-Instruct</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.91</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.29</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.71</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.56</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.19</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.63</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.70</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.49</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.49</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 px-4 border-b border-gray-200 font-medium">GPT-4o</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.90</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center font-bold text-blue-700">0.48</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.67</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.37</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center font-bold text-blue-700">0.84</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.50</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center font-bold text-blue-700">0.82</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.46</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center font-bold text-blue-700">0.70</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 px-4 border-b border-gray-200 font-medium">LearnLM-1.5-Pro</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center font-bold text-blue-700">0.94</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.32</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center font-bold text-blue-700">0.75</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center font-bold text-blue-700">0.57</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.74</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center font-bold text-blue-700">0.64</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.68</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center font-bold text-blue-700">0.66</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.67</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 px-4 border-b border-gray-200 font-medium">Llemma-7B-ScienceTutor</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.62</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.29</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.66</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.29</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.16</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.37</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.48</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.38</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.42</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 px-4 border-b border-gray-200 font-medium">Qwen2.5-7B-SocraticLM</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.73</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.32</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.05</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.39</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.23</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.39</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.39</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.28</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.28</td>
+                        </tr>
+                        <tr>
+                            <td class="py-2 px-4 border-b border-gray-200 font-medium">Qwen2.5-Math-7B-Instruct</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.88</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.35</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.43</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.47</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.49</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.06</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.07</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.05</td>
+                            <td class="py-2 px-4 border-b border-gray-200 text-center">0.05</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Quick Start Section -->
+        <section class="mb-12 bg-white rounded-lg shadow-md p-8">
+            <h3 class="text-xl font-semibold text-blue-800 mb-4">0. Run your model locally using vllm</h3>
+            <p class="text-gray-700 mb-4">For more details on how to run your model locally using vllm, see <a href="https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html#vllm-server" class="text-blue-600 hover:underline">vllm documentation</a>.</p>
+            <div class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto font-mono text-sm mb-6">
+                <pre>vllm serve [[model_name]]</pre>
+            </div>
+            <h2 class="text-2xl font-bold text-blue-800 mb-4">1. Quick Start - Evaluate a New Model</h2>
+            <div class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto font-mono text-sm mb-6">
+                <pre># Example with openai API
+python main.py --tasks mistake_location.yaml --provider completion_api --model_args model=gpt-4o-mini-2024-07-18,is_chat=True,api_key=&lt;API_KEY&gt;
+
+# Example with vllm model
+python main.py --tasks mistake_location.yaml --provider completion_api --model_args base_url=base_url=http://localhost:8000/v1,model=meta-llama/Llama-3.2-3B-Instruct,is_chat=True</pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-blue-800 mb-3">Required Parameters</h3>
+            <ul class="list-none text-gray-700 space-y-4">
+                <li>
+                    <p class="font-semibold">--tasks</p>
+                    <p class="pl-4 text-sm">Task definition file in the <code>configs</code> folder. Use comma separated list for multiple sequential tasks.</p>
+                    <ul class="list-disc pl-8 text-sm mt-2 space-y-1">
+                        <li><code>problem_solving.yaml</code>: Task definition for problem solving.</li>
+                        <li><code>socratic_questioning.yaml</code>: Task definition for socratic questioning.</li>
+                        <li><code>student_solution_generation.yaml</code>: Task definition for student solution generation.</li>
+                        <li><code>mistake_location.yaml</code>: Task definition for mistake location.</li>
+                        <li><code>mistake_correction.yaml</code>: Task definition for mistake correction.</li>
+                        <li><code>scaffolding_generation.yaml</code>: Task definition for scaffolding generation.</li>
+                        <li><code>pedagogy_following.yaml</code>: Task definition for pedagogy following.</li>
+                        <li><code>scaffolding_generation_hard.yaml</code>: Task definition for scaffolding generation hard.</li>
+                        <li><code>pedagogy_following_hard.yaml</code>: Task definition for pedagogy following hard.</li>
+                    </ul>
+                </li>
+                <li class="mt-4">
+                    <p class="font-semibold">--provider</p>
+                    <p class="pl-4 text-sm">API provider to use for the task.</p>
+                    <ul class="list-disc pl-8 text-sm mt-2 space-y-1">
+                        <li><code>completion_api</code>: Use the completion API for the task. Support any OpenAI-type API. Use for openai and vllm models.</li>
+                        <li><code>gemini</code>: Use the gemini API for the task.</li>
+                    </ul>
+                </li>
+                <li class="mt-4">
+                    <p class="font-semibold">--model_args</p>
+                    <p class="pl-4 text-sm">Model arguments to pass to the API provider.</p>
+                    <ul class="list-disc pl-8 text-sm mt-2 space-y-1">
+                        <li><code>base_url</code>: Base URL of the API provider. Empty for openai and gemini.</li>
+                        <li><code>model</code>: Model name to use for the task. Default is the first available model.</li>
+                        <li><code>api_key</code>: API key to access API. Empty for vllm models.</li>
+                        <li><code>is_chat</code>: Whether the model is chat-based or not. Default is False.</li>
+                        <li><code>temperature</code>: Temperature for sampling. Default is 0.0.</li>
+                        <li><code>max_tokens</code>: Maximum tokens to generate. Default is 2048.</li>
+                        <li><code>max_retries</code>: Maximum retries for the API. Default is 3.</li>
+                    </ul>
+                </li>
+            </ul>
+           </br>
+
+
+            <h3 class="text-xl font-semibold text-blue-800 mb-4">2. Run reward model of the Pedagogical Ability tasks</h3>
+            <div class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto font-mono text-sm mb-6">
+                <pre>python reward_models/eval_pedagogical_tuned.py</pre>
+            </div>
+
+            <h3 class="text-xl font-semibold text-blue-800 mb-4">3. Visualize results</h3>
+            <div class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto font-mono text-sm mb-6">
+                <pre>python visualize.py --results_dir results/</pre>
+            </div>
+            <div class="flex justify-center my-4">
+                <img src="./images/figure2.png" alt="Results Visualization" class="max-w-full rounded-lg shadow-md">
+            </div>
+        </section>
+
+        <!-- Installation Section -->
+        <section class="mb-12 bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-2xl font-bold text-blue-800 mb-4">Installation</h2>
+            <div class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto font-mono text-sm">
+                <pre>pip install -r requirements.txt</pre>
+            </div>
+        </section>
+
+
+
+        <footer class="text-center text-gray-600 text-sm mt-12 mb-6">
+            <p>MathTutorBench is licensed under <a href="https://creativecommons.org/licenses/by/4.0/deed.en" class="text-blue-600 hover:underline">CC BY 4.0</a></p>
+        </footer>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Sorting functionality
+            let currentSort = {
+                column: null,
+                direction: 'ascending'
+            };
+
+            // Function to sort table
+            function sortTable(column) {
+                const table = document.getElementById('leaderboardTable');
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+
+                // Reset all arrows
+                document.querySelectorAll('.sort-arrow').forEach(arrow => {
+                    arrow.className = 'sort-arrow';
+                });
+
+                // Determine sort direction
+                if (currentSort.column === column) {
+                    currentSort.direction = currentSort.direction === 'ascending' ? 'descending' : 'ascending';
+                } else {
+                    currentSort.column = column;
+                    currentSort.direction = 'descending'; // Default to highest first
+                }
+
+                // Update arrow
+                const arrow = table.querySelector(`th[data-sort="${column}"] .sort-arrow`);
+                arrow.className = `sort-arrow ${currentSort.direction}`;
+
+                // Sort the rows
+                rows.sort((a, b) => {
+                    let aValue, bValue;
+
+                    if (column === 'model') {
+                        aValue = a.cells[0].textContent;
+                        bValue = b.cells[0].textContent;
+                        return currentSort.direction === 'ascending'
+                            ? aValue.localeCompare(bValue)
+                            : bValue.localeCompare(aValue);
+                    } else {
+                        // Get column index
+                        const colIndex = Array.from(table.querySelectorAll('th'))
+                            .findIndex(th => th.getAttribute('data-sort') === column);
+
+                        aValue = parseFloat(a.cells[colIndex].textContent);
+                        bValue = parseFloat(b.cells[colIndex].textContent);
+
+                        return currentSort.direction === 'ascending'
+                            ? aValue - bValue
+                            : bValue - aValue;
+                    }
+                });
+
+                // Re-append rows in sorted order
+                rows.forEach(row => tbody.appendChild(row));
+
+                // Highlight column
+                table.querySelectorAll('th, td').forEach(cell => {
+                    cell.classList.remove('highlight');
+                });
+
+                const colIndex = Array.from(table.querySelectorAll('th'))
+                    .findIndex(th => th.getAttribute('data-sort') === column);
+
+                table.querySelectorAll(`th:nth-child(${colIndex + 1}), td:nth-child(${colIndex + 1})`)
+                    .forEach(cell => cell.classList.add('highlight'));
+            }
+
+            // Add click handlers to all sortable headers
+            document.querySelectorAll('th[data-sort]').forEach(header => {
+                header.addEventListener('click', () => {
+                    sortTable(header.getAttribute('data-sort'));
+                });
+            });
+
+            // Default sort by highest performance on Problem Solving
+            sortTable('ps');
+        });
+    </script>
+</body>
+</html>
