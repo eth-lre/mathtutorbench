@@ -1,8 +1,8 @@
 name: mistake_location
-dataset_path: dataset/stepverify.json
-dataset_name: main
+dataset_path: eth-nlped/stepverify
+dataset_name: default
 training_split: train
-test_split: test
+test_split: train
 system_prompt: "You are an experienced math teacher. Your goal is to identify the step of the first mistake in the Student's Solution to a Problem.
 \n{{ shots }}
 \nProblem: {{question}}

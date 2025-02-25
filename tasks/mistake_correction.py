@@ -1,7 +1,8 @@
 from typing import Dict, List, Any
 import re
+
+from dataloaders.base import HuggingFaceDataset
 from registry import TaskRegistry
-from dataloaders.verifiers import StepVerifyDataset
 from .base import Task, TaskConfig
 
 
@@ -12,8 +13,43 @@ class MistakeCorrectionTask(Task):
 
     def _load_dataset(self) -> None:
         """Load and preprocess the verifiers dataset"""
-        self.train_dataset = StepVerifyDataset(self.config.dataset_path).load()
-        self.test_dataset = StepVerifyDataset(self.config.dataset_path).load()
+        self.train_dataset = HuggingFaceDataset(self.config.dataset_path, self.config.dataset_name,
+                                                split=self.config.training_split).load()
+        self.test_dataset = HuggingFaceDataset(self.config.dataset_path, self.config.dataset_name,
+                                               split=self.config.test_split).load()
+        self.train_dataset = self._format_dataset(self.train_dataset)
+        self.test_dataset = self._format_dataset(self.test_dataset)
+
+    def _format_dataset(self, raw_examples: List[Dict[str, str]]) -> List[Dict[str, str]]:
+        processed_examples = []
+        for example in raw_examples:
+            # Process dialog history
+            conversation_list = example.get("dialog_history", [])
+            formatted_dialog = []
+            cutoff = len(conversation_list)
+
+            # Find the cutoff point where the student response starts
+            for i, turn in enumerate(conversation_list):
+                if turn["user"] == "Student":
+                    cutoff = i
+                    break
+                formatted_dialog.append(f"Teacher: {turn['text']}")
+
+            dialog_history_str = "\n".join(formatted_dialog)
+
+            error_example = {
+                'question': example['problem'],
+                'student_solution': "\\n".join(["Step " + str(sub_index + 1) + " - " + substep for sub_index, substep in
+                                                enumerate(example["student_incorrect_solution"][:-1])]),
+                'is_error': True,
+                'error_step': int(example['incorrect_index']) + 1,  # Convert to 1-based indexing
+                'dialog_history': dialog_history_str,
+                "student_chat_solution": conversation_list[cutoff]['text'],
+                "reference_solution": example["reference_solution"],
+            }
+            processed_examples.append(error_example)
+
+        return processed_examples
 
     def parse_response(self, response: str) -> float:
         """Extract the final answer from the model's response"""

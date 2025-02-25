@@ -56,9 +56,9 @@ python main.py --tasks mistake_location.yaml --provider completion_api --model_a
 
 
 ### 2. Run reward model of the Pedagogical Ability tasks
-Set the `DATA_PATH` to model outputs of the pedagogical ability tasks.
+Set the `--data_path` to model outputs of the pedagogical ability tasks. The model computes win rates of generated teacher utterance over the ground truth teacher utterance.
 ```bash
-python reward_models/eval_pedagogical_tuned.py
+python reward_models/compute_scaffolding_score.py --data_path results/generations-<specific-model>.json
 ```
 
 ### 3. Visualize results
