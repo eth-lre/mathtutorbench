@@ -88,8 +88,21 @@ pip install -r requirements.txt
 
 
 ## Adding a New Task
-- TBD
+Will be updated soon.
 
+## Submit your model to leaderboard
+Will be updated soon.
 
 ## Citation
-- TODO
+Please cite as:
+```bibtex
+@article{macina2025mathtutorbench,
+      title={MathTutorBench: A Benchmark for Measuring Open-ended\\ Pedagogical Capabilities of LLM Tutors}, 
+      author={Jakub Macina and Nico Daheim and Ido Hakimi and Manu Kapur and Iryna Gurevych and Mrinmaya Sachan},
+      year={2025},
+      eprint={},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/}, 
+}
+```
