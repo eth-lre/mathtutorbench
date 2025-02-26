@@ -32,7 +32,7 @@ python main.py --tasks mistake_location.yaml --provider completion_api --model_a
 python main.py --tasks mistake_location.yaml --provider completion_api --model_args base_url=base_url=http://localhost:8000/v1,model=meta-llama/Llama-3.2-3B-Instruct,is_chat=True
 ```
 - Required:
-  - `--tasks`: Task definition file in the `configs` folder. Use comma separated list for multiple sequential tasks.
+  - `--tasks`: Task definition file in the `configs` folder. Use comma `,` separated list for multiple sequential tasks.
     - `problem_solving.yaml`: Task definition for problem solving.
     - `socratic_questioning.yaml`: Task definition for socratic questioning.
     - `student_solution_generation.yaml`: Task definition for student solution generation.
