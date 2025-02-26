@@ -47,7 +47,7 @@
                 <a href="#" class="inline-flex items-center px-3 py-1 bg-red-600 text-white rounded-md text-sm hover:bg-red-700 transition">
                     <span>Arxiv</span>
                 </a>
-                <a href="https://huggingface.co/eth-nlped/pedagogical-reward-model" class="inline-flex items-center px-3 py-1 bg-yellow-500 text-white rounded-md text-sm hover:bg-yellow-600 transition">
+                <a href="https://huggingface.co/eth-nlped/Qwen2.5-1.5B-pedagogical-rewardmodel" class="inline-flex items-center px-3 py-1 bg-yellow-500 text-white rounded-md text-sm hover:bg-yellow-600 transition">
                     <span class="icon mr-1">🤗</span> <span>Pedagogical Reward Model</span>
                 </a>
                 <a href="https://creativecommons.org/licenses/by/4.0/deed.en" class="inline-flex items-center px-3 py-1 bg-gray-500 text-white rounded-md text-sm hover:bg-gray-600 transition">
@@ -262,9 +262,9 @@ python main.py --tasks mistake_location.yaml --provider completion_api --model_a
            </br>
 
 
-            <h3 class="text-xl font-semibold text-blue-800 mb-4">2. Run reward model of the Pedagogical Ability tasks</h3>
+            <h3 class="text-xl font-semibold text-blue-800 mb-4">2. Run reward model of the Pedagogical Ability tasks - Scaffolding Score </h3>
             <div class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto font-mono text-sm mb-6">
-                <pre>python reward_models/eval_pedagogical_tuned.py</pre>
+                <pre>python reward_models/compute_scaffolding_score.py --data_path results/generations-specific-model.json</pre>
             </div>
 
             <h3 class="text-xl font-semibold text-blue-800 mb-4">3. Visualize results</h3>
