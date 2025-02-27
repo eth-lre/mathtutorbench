@@ -1,4 +1,7 @@
+from pathlib import Path
+
 import torch
+import yaml
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 import numpy as np
 from typing import Dict, List, Union
@@ -203,6 +206,27 @@ def evaluate_preference_accuracy(
     with open(enriched_path, 'w') as f:
         json.dump(enriched_data, f, indent=2)
 
+    # Update results yaml file
+    path = Path(args.data_path)
+    parts = path.stem.split('-')  # Split filename by '-'
+    model_name = parts[1]  # Extract model name
+    task_config_name = parts[2]  # Extract task config name
+
+    results_yaml_file = "../results/" + f"results-{model_name}.yaml"
+    with open(results_yaml_file, 'r') as f:
+        data = results_yaml_file.safe_load(f)
+
+    if not data:
+        data = {}
+    # Find the matching task config and update
+    if task_config_name in data:
+        data[task_config_name]['results'] = results
+    else:
+        data[task_config_name] = {'results': results}
+
+    with open(results_yaml_file, 'w') as f:
+        yaml.dump(data, f)
+
     return results
 
 
@@ -217,3 +241,4 @@ if __name__ == "__main__":
     MODEL_NAME = "eth-nlped/Qwen2.5-1.5B-pedagogical-rewardmodel"
     results = evaluate_preference_accuracy(MODEL_NAME, args.data_path)
     print(f"Final Results: {results}")
+
