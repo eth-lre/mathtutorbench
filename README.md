@@ -1,5 +1,5 @@
 # MathTutorBench: A Benchmark for Measuring Open-ended Pedagogical Capabilities of LLM Tutors
-[![Arxiv](https://img.shields.io/badge/Arxiv-XXXX-red?style=flat-square&logo=arxiv&logoColor=white)]()
+[![Arxiv](https://img.shields.io/badge/Arxiv-2502.18940-red?style=flat-square&logo=arxiv&logoColor=white)](https://arxiv.org/abs/2502.18940)
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC_BY_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/deed.en)
 [![Python Versions](https://img.shields.io/badge/Python-3.12-blue.svg?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 
@@ -100,9 +100,9 @@ Please cite as:
       title={MathTutorBench: A Benchmark for Measuring Open-ended\\ Pedagogical Capabilities of LLM Tutors}, 
       author={Jakub Macina and Nico Daheim and Ido Hakimi and Manu Kapur and Iryna Gurevych and Mrinmaya Sachan},
       year={2025},
-      eprint={},
+      eprint={2502.18940},
       archivePrefix={arXiv},
       primaryClass={cs.CL},
-      url={https://arxiv.org/abs/}, 
+      url={https://arxiv.org/abs/2502.18940},
 }
 ```
