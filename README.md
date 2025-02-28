@@ -62,6 +62,7 @@ python reward_models/compute_scaffolding_score.py --data_path results/generation
 ```
 
 ### 3. Visualize results
+Results are available in the `results` folder. To visualize the results, run:
 ```bash
 python visualize.py --results_dir results/
 ```
@@ -87,18 +88,21 @@ pip install -r requirements.txt
 | Qwen2.5-Math-7B-Instruct | 0.88 | 0.35 | 0.43 | 0.47 | 0.49 | 0.06 | 0.07 | 0.05 | 0.05 |
 
 
-## Adding a New Task
-Will be updated soon.
-
 ## Submit your model to leaderboard
-Will be updated soon.
+To submit your model to the leaderboard, please follow the steps below:
+1. Open a new issue with the title `Leaderboard Submission: <Model Name>`.
+2. Provide the exact model name on the Huggingface hub and if specific code/arguments/settings are needed for the model or the vllm library which will be used to run your model. Please copy the results from the local run of the model.
+
+## Adding a New Task
+Please open a new PR and provide the configuration of the task in the `configs` folder and the task implementation in the `tasks` folder.
+
 
 ## Citation
 Please cite as:
 ```bibtex
 @article{macina2025mathtutorbench,
       title={MathTutorBench: A Benchmark for Measuring Open-ended\\ Pedagogical Capabilities of LLM Tutors}, 
-      author={Jakub Macina and Nico Daheim and Ido Hakimi and Manu Kapur and Iryna Gurevych and Mrinmaya Sachan},
+      author={Jakub Macina, Nico Daheim, Ido Hakimi, Manu Kapur, Iryna Gurevych, Mrinmaya Sachan},
       year={2025},
       eprint={2502.18940},
       archivePrefix={arXiv},

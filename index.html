@@ -287,16 +287,35 @@ python main.py --tasks mistake_location.yaml --provider completion_api --model_a
             </div>
         </section>
 
-        <h2>Citation</h2>
-        <pre><code>@article{macina2025mathtutorbench,
-      title={MathTutorBench: A Benchmark for Measuring Open-ended\\ Pedagogical Capabilities of LLM Tutors},
-      author={Jakub Macina and Nico Daheim and Ido Hakimi and Manu Kapur and Iryna Gurevych and Mrinmaya Sachan},
-      year={2025},
-      eprint={2502.18940},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2502.18940},
+        <!-- Submit your model to leaderboard -->
+        <section class="mb-12 bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-2xl font-bold text-blue-800 mb-4">Submit your model to the leaderboard</h2>
+            <p class="text-gray-700 mb-6">To submit your model to the leaderboard,  please follow the steps below:</p>
+            <ol class="list-decimal pl-6 text-gray-700 space-y-2 mb-6">
+                <li>Open a new issue with the title <i>Leaderboard Submission: model-name.</i></li>
+                <li>Provide the exact model name on the Huggingface hub and if specific code/arguments/settings are needed for the model or the vllm library which will be used to run your model. Please copy the results from the local run of the model.</li>
+            </ol>
+        </section>
+
+         <!-- Adding a new task -->
+        <section class="mb-12 bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-2xl font-bold text-blue-800 mb-4">Add a new benchmark task</h2>
+            <p>Please open a new PR and provide the configuration of the task in the <i>configs</i> folder and the task implementation in the <i>tasks</i> folder.</p>
+        </section>
+
+         <!-- Citation -->
+        <section class="mb-12 bg-white rounded-lg shadow-md p-8">
+            <h2 class="text-2xl font-bold text-blue-800 mb-4">Citation</h2>
+            <pre><code>@article{macina2025mathtutorbench,
+          title={MathTutorBench: A Benchmark for Measuring Open-ended\\ Pedagogical Capabilities of LLM Tutors},
+          author={Jakub Macina, Nico Daheim, Ido Hakimi, Manu Kapur, Iryna Gurevych, Mrinmaya Sachan},
+          year={2025},
+          eprint={2502.18940},
+          archivePrefix={arXiv},
+          primaryClass={cs.CL},
+          url={https://arxiv.org/abs/2502.18940},
 }</code></pre>
+        </section>
     </div>
 
     <script>
