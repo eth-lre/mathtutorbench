@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from mathbridge import MathBridge
+from dataloaders.mathbridge import MathBridge
 from registry import TaskRegistry
 from .base import Task, TaskConfig
 

@@ -29,13 +29,13 @@ vllm serve [[model_name]]
 # Example with openai API
 python main.py --tasks mistake_location.yaml --provider completion_api --model_args model=gpt-4o-mini-2024-07-18,is_chat=True,api_key=<API_KEY>
 # Example with vllm model
-python main.py --tasks mistake_location.yaml --provider completion_api --model_args base_url=base_url=http://localhost:8000/v1,model=meta-llama/Llama-3.2-3B-Instruct,is_chat=True
+python main.py --tasks mistake_location.yaml --provider completion_api --model_args base_url=http://localhost:8000/v1,model=meta-llama/Llama-3.2-3B-Instruct
 ```
 - Required:
   - `--tasks`: Task definition file in the `configs` folder. Use comma `,` separated list for multiple sequential tasks.
     - `problem_solving.yaml`: Task definition for problem solving.
     - `socratic_questioning.yaml`: Task definition for socratic questioning.
-    - `student_solution_generation.yaml`: Task definition for student solution generation.
+    - `student_solution_correctness.yaml`: Task definition for student solution generation.
     - `mistake_location.yaml`: Task definition for mistake location.
     - `mistake_correction.yaml`: Task definition for mistake correction.
     - `scaffolding_generation.yaml`: Task definition for scaffolding generation.
@@ -58,7 +58,7 @@ python main.py --tasks mistake_location.yaml --provider completion_api --model_a
 ### 2. Run reward model of the Pedagogical Ability tasks
 Set the `--data_path` to model outputs of the pedagogical ability tasks. The model computes win rates of generated teacher utterance over the ground truth teacher utterance.
 ```bash
-python reward_models/compute_scaffolding_score.py --data_path results/generations-<specific-model>.json
+python reward_model/compute_scaffolding_score.py --data_path results/generations-<specific-model>.json
 ```
 
 ### 3. Visualize results

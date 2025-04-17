@@ -4,7 +4,7 @@ from pathlib import Path
 import yaml
 from typing import Dict, Any
 
-from completion_api import create_llm_model, LLMConfig
+from models.completion_api import create_llm_model, LLMConfig
 from tasks.base import TaskConfig
 from registry import TaskRegistry
 from tqdm import tqdm
@@ -96,7 +96,7 @@ def main():
             print(formatted_ground_truth)
             targets.append(formatted_ground_truth)
 
-            if "pedagogy" in task_config.name:
+            if "pedagogy" in task_config.name or 'scaffolding' in task_config.name:
                 generation = {
                     "problem": example.get("question", ""),
                     "reference_solution": example.get("reference_solution", "N/A"),
