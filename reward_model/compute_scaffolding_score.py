@@ -214,7 +214,7 @@ def evaluate_preference_accuracy(
 
     results_yaml_file = "../results/" + f"results-{model_name}.yaml"
     with open(results_yaml_file, 'r') as f:
-        data = results_yaml_file.safe_load(f)
+        data = yaml.safe_load(f)
 
     if not data:
         data = {}

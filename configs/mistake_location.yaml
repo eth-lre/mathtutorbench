@@ -3,19 +3,24 @@ dataset_path: eth-nlped/stepverify
 dataset_name: default
 training_split: train
 test_split: train
-system_prompt: "You are an experienced math teacher. Your goal is to identify the step of the first mistake in the Student's Solution to a Problem.
-\n{{ shots }}
-\nProblem: {{question}}
-\nStudent Solution: {{student_solution}}
-\nQ: Is the Student Solution incorrect? Write only the step number with the first error or 0 if no error is found.
-\nA:"
+system_prompt: |
+  You are an experienced math teacher. Your goal is to identify the step of the first mistake in the Student's Solution to a Problem.
+  {{ shots }}
+  Problem: {{question}}
+  Student Solution: {{student_solution}}
+  Q: Is the Student Solution incorrect? Write only the step number with the first error or 0 if no error is found.
+  A:
 ground_truth_format: "{{ error_step }}"
-few_shot_samples: "Problem: Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?
-  \nStudent Solution: Step 1 - She sold 48/2 = 24 clips in May.\nStep 2 - Natalia sold 48+24 = 72 clips in April and May together.
-  \nQ: Is the Student Solution incorrect? Write only the step number with the first error or 0 if no error is found.
-  \nA: 0
-  \nProblem: Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?
-  \nStudent Solution: Step 1 - Natalia sold 48 clips in April.\nStep 2 - She sold 48*2 = 96 clips in May.\nStep 3 - She sold 48+96 = 144 clips in April and May together.
-  \nQ: Is the Student Solution incorrect? Write only the step number with the first error or 0 if no error is found.
-  \nA: 2"
-stop: ["Problem:", "Q:"]w
+few_shot_samples: |
+  Problem: Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?
+  Student Solution: Step 1 - She sold 48/2 = 24 clips in May.
+  Step 2 - Natalia sold 48+24 = 72 clips in April and May together.
+  Q: Is the Student Solution incorrect? Write only the step number with the first error or 0 if no error is found.
+  A: 0
+  Problem: Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?
+  Student Solution: Step 1 - Natalia sold 48 clips in April.
+  Step 2 - She sold 48*2 = 96 clips in May.
+  Step 3 - She sold 48+96 = 144 clips in April and May together.
+  Q: Is the Student Solution incorrect? Write only the step number with the first error or 0 if no error is found.
+  A: 2
+stop: ["Problem:", "Q:"]

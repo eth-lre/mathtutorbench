@@ -1,6 +1,6 @@
 from typing import Dict, List, Any
 
-from extraction import extract_ground_truth_questions
+from tasks.extraction import extract_ground_truth_questions
 from registry import TaskRegistry
 from .base import Task
 import sacrebleu

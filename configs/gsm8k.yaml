@@ -3,10 +3,15 @@ dataset_path: gsm8k
 dataset_name: main
 training_split: train
 test_split: test
-system_prompt: "You are a helpful math tutor. Solve the question step-by-step. Provide your final answer after 'Final answer'.\n{{ shots }}\nQuestion: {{question}}\nAnswer:"
+system_prompt: |
+  You are a helpful math tutor. Solve the question step-by-step. Provide your final answer after 'Final answer'.
+  {{ shots }}
+  Question: {{question}}
+  Answer:
 ground_truth_format: "{{ answer.split('### ')[-1].replace(',', '').strip() }}"
-few_shot_samples: "Question: Janet's ducks lay 16 eggs per day. She eats three for breakfast every morning and sells the rest at the farmers market daily for $2 per egg. How much in dollars does she make per day at the farmers market?
-\nAnswer: Janet sells 16-3 = 13 eggs. Janet makes 13*2 = 26 dollars per day at the farmers' market. Final answer: 26
-\nQuestion: Natalie sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalie sell in all?
-\nAnswer: Natalia sold 48/2 = 24 clips in May. Natalia sold 48+24 = 72 clips altogether in April and May. Final answer: 72"
+few_shot_samples: |
+  Question: Janet's ducks lay 16 eggs per day. She eats three for breakfast every morning and sells the rest at the farmers market daily for $2 per egg. How much in dollars does she make per day at the farmers market?
+  Answer: Janet sells 16-3 = 13 eggs. Janet makes 13*2 = 26 dollars per day at the farmers' market. Final answer: 26
+  Question: Natalie sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalie sell in all?
+  Answer: Natalia sold 48/2 = 24 clips in May. Natalia sold 48+24 = 72 clips altogether in April and May. Final answer: 72
 stop: ["Question:"]

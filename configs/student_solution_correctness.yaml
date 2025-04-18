@@ -3,17 +3,19 @@ dataset_path: eth-nlped/stepverify
 dataset_name: default
 training_split: train
 test_split: train
-system_prompt: "You are an experienced math teacher. Your goal is to identify the correctness of the Student's Solution to a Problem.
-\n{{ shots }}
-\nProblem: {{question}}
-\nConversation:
-\n{{dialog_history}}
-\nStudent: {{student_chat_solution}}
-\nQ: Is the Student Solution incorrect? Write 'Yes' if it is incorrect, or 'No' if it is correct.
-\nA:"
+system_prompt: |
+  You are an experienced math teacher. Your goal is to identify the correctness of the Student's Solution to a Problem.
+  {{ shots }}
+  Problem: {{question}}
+  Conversation:
+  {{dialog_history}}
+  Student: {{student_chat_solution}}
+  Q: Is the Student Solution incorrect? Write 'Yes' if it is incorrect, or 'No' if it is correct.
+  A:
 ground_truth_format: "{{ 'Yes' if is_error else 'No' }}"
-few_shot_samples: "Problem: Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?
-\nStudent Solution: I started by calculating clips in May which is 48/2 = 24. Then I sum this up, so she sold 48+24 = 72 clips in April and May together.
-\nQ: Is the Student Solution incorrect? Write 'Yes' if it is incorrect, or 'No' if it is correct.
-\nA: No"
+few_shot_samples: |
+  Problem: Natalia sold clips to 48 of her friends in April, and then she sold half as many clips in May. How many clips did Natalia sell altogether in April and May?
+  Student Solution: I started by calculating clips in May which is 48/2 = 24. Then I sum this up, so she sold 48+24 = 72 clips in April and May together.
+  Q: Is the Student Solution incorrect? Write 'Yes' if it is incorrect, or 'No' if it is correct.
+  A: No
 stop: ["Problem:", "Q:", "Explanation:"]

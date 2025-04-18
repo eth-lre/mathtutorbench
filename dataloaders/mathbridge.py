@@ -1,6 +1,6 @@
 import json
 from typing import List, Dict, Any
-from base import DatasetLoader
+from dataloaders.base import DatasetLoader
 
 
 class MathBridge(DatasetLoader):
