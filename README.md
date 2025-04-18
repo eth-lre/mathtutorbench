@@ -49,7 +49,7 @@ python main.py --tasks mistake_location.yaml --provider completion_api --model_a
     - `base_url`: Base URL of the API provider. Empty for openai and gemini.
     - `model`: Model name to use for the task. Default is the first available model.
     - `api_key`: API key to access API. Empty for vllm models.
-    - `is_chat`: Whether the model is chat-based or not. Default is False.
+    - `is_chat`: Whether the requests to the model should use chat-based template (Chat Completion API). Default is False.
     - `temperature`: Temperature for sampling. Default is 0.0.
     - `max_tokens`: Maximum tokens to generate. Default is 2048.
     - `max_retries`: Maximum retries for the API. Default is 3.
