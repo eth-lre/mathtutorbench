@@ -100,6 +100,7 @@ To submit your model to the leaderboard, please follow the steps below:
 Please open a new PR and provide the configuration of the task in the `configs` folder and the task implementation in the `tasks` folder.
 
 
+
 ## Citation
 Please cite as:
 ```bibtex
@@ -113,3 +114,9 @@ Please cite as:
       url={https://arxiv.org/abs/2502.18940},
 }
 ```
+
+This work is licensed under a
+[Creative Commons Attribution-ShareAlike 4.0 International License][cc-by-sa].
+
+[cc-by-sa]: http://creativecommons.org/licenses/by-sa/4.0/
+[cc-by-sa-shield]: https://img.shields.io/badge/License-CC%20BY--SA%204.0-lightgrey.svg
