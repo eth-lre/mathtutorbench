@@ -21,15 +21,18 @@
 ### 0. Run your model locally using vllm - skip if you are using API
 For more details on how to run your model locally using vllm, see [vllm](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html#vllm-server) documentation.
 ```bash
-vllm serve [[model_name]] --seed 42  
+vllm serve [[model_name]] --seed 42 --tensor-parallel-size 4
 ```
 
 ### 1. Run task(s) from the benchmark
 ```bash
 # Example with vllm model
 python main.py --tasks mistake_location.yaml --provider completion_api --model_args base_url=http://localhost:8000/v1,model=meta-llama/Llama-3.2-3B-Instruct
-# Example with openai API
-python main.py --tasks mistake_location.yaml --provider completion_api --model_args model=gpt-4o-mini-2024-07-18,is_chat=True,api_key=<API_KEY>
+# Example with OpenAI API
+python main.py --tasks mistake_location.yaml --provider completion_api --model_args model=gpt-4o-mini-2024-07-18,api_key=<API_KEY>
+# Example with LearnLM Gemini API
+python main.py --tasks mistake_location.yaml --provider gemini --model_args model==learnlm-1.5-pro-experimental,api_key=<API_KEY>
+
 ```
 - Required:
   - `--tasks`: Task definition file in the `configs` folder. Use comma `,` separated list for multiple sequential tasks.
