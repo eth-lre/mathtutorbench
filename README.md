@@ -19,7 +19,7 @@
 
 ## Quick Start - Evaluate a New Model
 ### 0. Run your model locally using vllm - skip if you are using API
-For more details on how to run your model locally using vllm, see [vllm](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html#vllm-server) documentation.
+For more details on how to run your model locally using vllm, see [vllm](https://docs.vllm.ai/en/latest/serving/openai_compatible_server.html#vllm-server) documentation. Optionally add tensor parallelism if you have multiple GPUs and your model is large.
 ```bash
 vllm serve [[model_name]] --seed 42 --tensor-parallel-size 4
 ```
@@ -29,9 +29,9 @@ vllm serve [[model_name]] --seed 42 --tensor-parallel-size 4
 # Example with vllm model
 python main.py --tasks mistake_location.yaml --provider completion_api --model_args base_url=http://localhost:8000/v1,model=meta-llama/Llama-3.2-3B-Instruct
 # Example with OpenAI API
-python main.py --tasks mistake_location.yaml --provider completion_api --model_args model=gpt-4o-mini-2024-07-18,api_key=<API_KEY>
+python main.py --tasks mistake_correction.yaml --provider completion_api --model_args model=gpt-4o-mini-2024-07-18,api_key=<API_KEY>
 # Example with LearnLM Gemini API
-python main.py --tasks mistake_location.yaml --provider gemini --model_args model==learnlm-1.5-pro-experimental,api_key=<API_KEY>
+python main.py --tasks student_solution_correctness.yaml --provider gemini --model_args model==learnlm-1.5-pro-experimental,api_key=<API_KEY>
 
 ```
 - Required:

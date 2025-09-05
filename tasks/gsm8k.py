@@ -25,7 +25,7 @@ filter_list = [
             }
         ]
 
-@TaskRegistry.register("gsm8k")
+@TaskRegistry.register("problem_solving")
 class GSM8K(Task):
 
     def parse_response(self, response: str) -> float:

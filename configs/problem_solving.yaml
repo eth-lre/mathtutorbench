@@ -1,4 +1,4 @@
-name: gsm8k
+name: problem_solving
 dataset_path: gsm8k
 dataset_name: main
 training_split: train
