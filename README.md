@@ -57,12 +57,33 @@ python main.py --tasks student_solution_correctness.yaml --provider gemini --mod
     - `max_tokens`: Maximum tokens to generate. Default is 2048.
     - `max_retries`: Maximum retries for the API. Default is 3.
 
+The performance of different benchmarked models averaged across tasks for Qwen2.5 family is as follows (using vllm version 0.8.0 on one node with 4x GH200 GPUs):
+
+| Model                  | Total time [min] | Examples/sec | Tokens/sec |
+|-------------------------|------------------|--------------|------------|
+| Qwen2.5-1.5B-Instruct  | 61.1             | 2.73         | 757.6      |
+| Qwen2.5-7B-Instruct    | 58.3             | 2.86         | 1012       |
+| Qwen2.5-32B-Instruct   | 545.3            | 0.31         | 166.3      |
+| Qwen2.5-72B-Instruct   | 233.9            | 0.71         | 135.2      |
+
 
 ### 2. Run reward model of the Pedagogical Ability tasks
 Set the `--data_path` to model outputs of the pedagogical ability tasks. The model computes win rates of generated teacher utterance over the ground truth teacher utterance.
 ```bash
 python reward_model/compute_scaffolding_score.py --data_path results/generations-<specific-model>.json
 ```
+
+As the model is small in size (1.5B parameters), running the full evaluation should be fast (within 10 minutes on a single GPU).
+Reward model computation performance with different batch sizes on a single GH200 GPU:
+
+| Batch size | Total time [sec] | Examples/sec | Tokens/sec |
+|------------|------------------|--------------|------------|
+| 1          | 419.58           | 7.01         | 6928.0     |
+| 8          | 406.08           | 7.25         | 7159.3     |
+| 64         | 413.28           | 7.12         | 7034.8     |
+| 128        | 408.87           | 7.20         | 7110.0     |
+
+
 
 ### 3. Visualize results
 Results are available in the `results` folder. To visualize the results, run:
