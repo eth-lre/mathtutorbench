@@ -73,7 +73,7 @@ class BaseLLMAPI(ABC):
         conversation = ""
         for msg in messages:
             role = msg["user"]
-            content = msg["test"]
+            content = msg["text"]
             conversation += f"{role}: {content}\n"
 
         formatted_conversation = conversation.strip()
