@@ -120,20 +120,33 @@ To submit your model to the leaderboard, please follow the steps below:
 ## Adding a New Task
 Please open a new PR and provide the configuration of the task in the `configs` folder and the task implementation in the `tasks` folder.
 
-
+# Scaffolding Score Pedagogical Reward Model
+- [Dataset](https://huggingface.co/datasets/dmacjam/pedagogical-rewardmodel-data) used to train and evaluate the Scaffolding score reward model
 
 ## Citation
 Please cite as:
 ```bibtex
-@article{macina2025mathtutorbench,
-      title={MathTutorBench: A Benchmark for Measuring Open-ended\\ Pedagogical Capabilities of LLM Tutors}, 
-      author={Jakub Macina, Nico Daheim, Ido Hakimi, Manu Kapur, Iryna Gurevych, Mrinmaya Sachan},
-      year={2025},
-      eprint={2502.18940},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2502.18940},
-}
+@inproceedings{macina-etal-2025-mathtutorbench,
+    title = "{M}ath{T}utor{B}ench: A Benchmark for Measuring Open-ended Pedagogical Capabilities of {LLM} Tutors",
+    author = "Macina, Jakub  and
+      Daheim, Nico  and
+      Hakimi, Ido  and
+      Kapur, Manu  and
+      Gurevych, Iryna  and
+      Sachan, Mrinmaya",
+    editor = "Christodoulopoulos, Christos  and
+      Chakraborty, Tanmoy  and
+      Rose, Carolyn  and
+      Peng, Violet",
+    booktitle = "Proceedings of the 2025 Conference on Empirical Methods in Natural Language Processing",
+    month = nov,
+    year = "2025",
+    address = "Suzhou, China",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2025.emnlp-main.11/",
+    doi = "10.18653/v1/2025.emnlp-main.11",
+    pages = "204--221",
+    ISBN = "979-8-89176-332-6",
 ```
 
 This work is licensed under a
