@@ -49,6 +49,8 @@ def main():
                         help='Output directory for results')
     parser.add_argument('--debug', action='store_true',
                       help='Enable debug logging')
+    parser.add_argument('--store_traces', action='store_true',
+                      help='Store thinking traces extracted from <think> blocks')
     args = parser.parse_args()
 
     # Parse model arguments
@@ -76,18 +78,29 @@ def main():
         predictions = []
         targets = []
         all_generations = []
+        all_traces = []
 
         # Process examples
         for example in tqdm(task.get_test_examples(), desc=f"Evaluating {task_config.name}"):
             # Prepare messages with few-shot examples if provided
             messages = []
             example["shots"] = task_config.few_shot_samples
+            system_prompt = task.get_system_prompt(example)
             # Get model response
-            response = model.generate(
-                messages=messages,
-                system_prompt=task.get_system_prompt(example),
-                stop=task_config.stop
-            )
+            if args.store_traces:
+                response, thinking_trace = model.generate(
+                    messages=messages,
+                    system_prompt=system_prompt,
+                    stop=task_config.stop,
+                    return_trace=True
+                )
+            else:
+                response = model.generate(
+                    messages=messages,
+                    system_prompt=system_prompt,
+                    stop=task_config.stop
+                )
+                thinking_trace = ""
             # Parse and store prediction
             prediction = task.parse_response(response)
             predictions.append(prediction)
@@ -107,6 +120,18 @@ def main():
                 }
                 all_generations.append(generation)
 
+            if args.store_traces and thinking_trace:
+                all_traces.append({
+                    "task": task_config.name,
+                    "problem": example.get("question", ""),
+                    "student_solution": example.get("student_solution", ""),
+                    "dialog_history": example.get("dialog_history", ""),
+                    "system_prompt": system_prompt,
+                    "thinking_trace": thinking_trace,
+                    "visible_response": response,
+                    "ground_truth": str(formatted_ground_truth),
+                })
+
         # Compute metrics
         metrics = task.compute_metrics(predictions, targets)
         results[task_config.name] = metrics
@@ -124,6 +149,12 @@ def main():
         output_file = output_dir / f"generations-{config.model.split('/')[-1]}-{task_config.name}.json"
         with open(output_file, 'w') as f:
             json.dump(all_generations, f, indent=2)
+
+    if len(all_traces) > 0:
+        traces_file = output_dir / f"traces-{config.model.split('/')[-1]}-{task_config.name}.json"
+        with open(traces_file, 'w') as f:
+            json.dump(all_traces, f, indent=2)
+        print(f"Thinking traces saved to {traces_file}")
 
 
 if __name__ == "__main__":

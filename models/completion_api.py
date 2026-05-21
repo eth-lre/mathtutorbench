@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Union
 import jinja2
+import re
 import requests
 from tenacity import retry, stop_after_attempt, wait_exponential
 import google.generativeai as genai
@@ -67,6 +68,18 @@ class BaseLLMAPI(ABC):
     def __init__(self, config: LLMConfig):
         self.config = config
 
+    def _extract_thinking(self, response: str) -> str:
+        """Extract hidden reasoning from <think> blocks, if present."""
+        match = re.search(r'<think>(.*?)</think>', response, flags=re.DOTALL)
+        if match:
+            return match.group(1).strip()
+
+        # Preserve partial traces when generation is cut off before </think>.
+        match = re.search(r'<think>(.*?)$', response, flags=re.DOTALL)
+        if match:
+            return match.group(1).strip()
+        return ""
+
     def _format_conversation(self, messages: List[Dict]) -> str:
         """Format messages into a conversation string"""
         # print("Formatting conversation from messages: " + "|EOM|".join(messages))
@@ -94,6 +107,30 @@ class BaseLLMAPI(ABC):
         # print("Final formatted prompt: " + prompt)
         return prompt
 
+    def _strip_thinking(self, response: str, stop: Optional[List[str]] = None) -> str:
+        """Remove <think> blocks before applying task stop tokens.
+
+        Chat reasoning models can emit a reasoning block before the visible answer.
+        Completion-style stop tokens such as "\\n" or "\\n\\n" can appear inside
+        that reasoning block, so passing them directly to chat completion APIs may
+        truncate the output before the answer is generated. For chat mode, callers
+        should request the full response, strip reasoning locally, then apply stop
+        tokens to the visible answer only.
+        """
+        text = re.sub(r'<think>.*?</think>', '', response, flags=re.DOTALL)
+        text = re.sub(r'<think>.*$', '', text, flags=re.DOTALL).strip()
+
+        # Some chat models echo completion-style role prefixes from prompts.
+        text = re.sub(r'^Teacher\s*\([^)]*\)\s*:\s*', '', text)
+        text = re.sub(r'^Teacher\s*:\s*', '', text).strip()
+
+        if stop:
+            for token in stop:
+                idx = text.find(token)
+                if idx != -1:
+                    text = text[:idx]
+        return text.strip()
+
     def _format_chat_messages(self, system_prompt: str, messages: List[Dict]) -> List[Dict]:
         """Format messages for chat completions"""
         # print("Formatting chat messages with system_prompt: " + system_prompt)
@@ -110,8 +147,11 @@ class BaseLLMAPI(ABC):
         pass
 
     @abstractmethod
-    def _make_chat_request(self, messages: List[Dict], stop: Optional[List[str]] = None) -> str:
-        """Make a chat request - to be implemented by specific providers"""
+    def _make_chat_request(self, messages: List[Dict], stop: Optional[List[str]] = None) -> tuple:
+        """Make a chat request - to be implemented by specific providers.
+
+        Returns (visible_response, thinking_trace).
+        """
         pass
 
     def generate(
@@ -119,18 +159,29 @@ class BaseLLMAPI(ABC):
             messages: List[Dict],
             system_prompt: str,
             stop: Optional[List[str]] = None,
-    ) -> str:
-        """Generate completion using either chat or completion API"""
+            return_trace: bool = False,
+    ) -> Union[str, tuple]:
+        """Generate completion using either chat or completion API.
+
+        When return_trace is true, return (visible_response, thinking_trace).
+        Non-chat providers return an empty trace.
+        """
         print("==============================================================")
         print("Generating completion with model: " + self.config.model)
 
         try:
             if self.config.is_chat:
                 formatted_messages = self._format_chat_messages(system_prompt, messages)
-                return self._make_chat_request(formatted_messages, stop)
+                response, thinking_trace = self._make_chat_request(formatted_messages, stop)
+                if return_trace:
+                    return response, thinking_trace
+                return response
             else:
                 prompt = self._format_prompt(system_prompt, messages)
-                return self._make_completion_request(prompt, stop)
+                response = self._make_completion_request(prompt, stop)
+                if return_trace:
+                    return response, ""
+                return response
         except Exception as e:
             print("Failed to generate completion after retries: " + str(e))
             raise
@@ -185,26 +236,30 @@ class CompletionAPI(BaseLLMAPI):
         wait=wait_exponential(multiplier=1, min=4, max=10),
         reraise=True
     )
-    def _make_chat_request(self, messages: List[Dict], stop: Optional[List[str]] = None) -> str:
+    def _make_chat_request(self, messages: List[Dict], stop: Optional[List[str]] = None) -> tuple:
         try:
             # print("Making chat request with messages: " + str(messages))
             print("========================(Prompt-chat-start)======================================")
             # print(messages)
             print(messages[0]["content"])
             print("========================(Prompt-chat-end)======================================")
+            # Do not pass task stop tokens to chat APIs. Reasoning models can emit
+            # <think> blocks before their answer, and stop tokens may appear inside
+            # the reasoning. Strip thinking and apply stops to visible text below.
             response = self.client.chat.completions.create(
                 model=self.config.model,
                 messages=messages,
                 temperature=self.config.temperature,
                 max_tokens=self.config.max_tokens,
-                stop=stop
             )
-            completion = response.choices[0].message.content
+            raw_response = response.choices[0].message.content or ""
+            thinking_trace = self._extract_thinking(raw_response)
+            completion = self._strip_thinking(raw_response, stop)
             print("===========================(Response-chat-start)===================================")
             print(completion)
             print("===========================(Response-chat-end)===================================")
             # print("Received chat response: " + completion)
-            return completion
+            return completion, thinking_trace
         except Exception as e:
             print("Error in chat request: " + str(e))
             raise
@@ -249,14 +304,14 @@ class OllamaAPI(BaseLLMAPI):
             print("Error in completion request: " + str(e))
             raise
 
-    def _make_chat_request(self, messages: List[Dict], stop: Optional[List[str]] = None) -> str:
+    def _make_chat_request(self, messages: List[Dict], stop: Optional[List[str]] = None) -> tuple:
         """Make a chat request to Ollama"""
         # Ollama doesn't have a separate chat endpoint, so we'll format messages into a prompt
         formatted_prompt = ""
         for message in messages:
             formatted_prompt += f"{message['role']}: {message['content']}\nassistant: "
 
-        return self._make_completion_request(formatted_prompt, stop)
+        return self._make_completion_request(formatted_prompt, stop), ""
 
 
 class GeminiAPI(BaseLLMAPI):
@@ -292,7 +347,7 @@ class GeminiAPI(BaseLLMAPI):
             print("Error in completion request: " + str(e))
             raise
 
-    def _make_chat_request(self, messages: List[Dict], stop: Optional[List[str]] = None) -> str:
+    def _make_chat_request(self, messages: List[Dict], stop: Optional[List[str]] = None) -> tuple:
         print("========================(Prompt-chat-start)======================================")
         # print(messages)
         print(messages[0]["content"])
@@ -315,4 +370,4 @@ class GeminiAPI(BaseLLMAPI):
         print("===========================(Response-chat-start)===================================")
         print(completion)
         print("===========================(Response-chat-end)===================================")
-        return completion
+        return completion, ""

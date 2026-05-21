@@ -28,6 +28,8 @@ vllm serve [[model_name]] --seed 42 --tensor-parallel-size 4
 ```bash
 # Example with vllm model
 python main.py --tasks mistake_location.yaml --provider completion_api --model_args base_url=http://localhost:8000/v1,model=meta-llama/Llama-3.2-3B-Instruct
+# Example with an OpenAI-compatible chat/reasoning model served by vLLM
+python main.py --tasks scaffolding_generation.yaml --provider completion_api --model_args base_url=http://localhost:8000/v1,model=Qwen/Qwen3-8B,is_chat=true,max_tokens=4096 --store_traces
 # Example with OpenAI API
 python main.py --tasks mistake_correction.yaml --provider completion_api --model_args model=gpt-4o-mini-2024-07-18,api_key=<API_KEY>
 # Example with LearnLM Gemini API
@@ -56,6 +58,9 @@ python main.py --tasks student_solution_correctness.yaml --provider gemini --mod
     - `temperature`: Temperature for sampling. Default is 0.0.
     - `max_tokens`: Maximum tokens to generate. Default is 2048.
     - `max_retries`: Maximum retries for the API. Default is 3.
+  - `--store_traces`: For chat models that emit `<think>...</think>` blocks, save extracted thinking traces to `traces-*.json`.
+
+For chat/reasoning models, MathTutorBench strips `<think>...</think>` blocks before parsing and scoring the visible answer. In chat mode, task stop tokens are applied after this stripping step instead of being sent to the API request, because completion-style stop tokens such as blank lines can otherwise truncate the hidden reasoning before the final answer is produced. Use a larger `max_tokens` budget for reasoning models so the model can finish both the thinking trace and visible answer.
 
 The performance of different benchmarked models averaged across tasks for Qwen2.5 family is as follows (using vllm version 0.8.0 on one node with 4x GH200 GPUs):
 
