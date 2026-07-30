@@ -88,6 +88,7 @@ def main():
                 system_prompt=task.get_system_prompt(example),
                 stop=task_config.stop
             )
+            response = response if response else ""
             # Parse and store prediction
             prediction = task.parse_response(response)
             predictions.append(prediction)

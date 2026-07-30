@@ -24,6 +24,7 @@ class LLMConfig:
     temperature: float = 0.0
     max_tokens: int = 2048
     is_chat: bool = False
+    is_thinking: bool = False
     max_retries: int = 3
 
     def __post_init__(self):
@@ -139,15 +140,24 @@ class BaseLLMAPI(ABC):
 class CompletionAPI(BaseLLMAPI):
     def __init__(self, config: LLMConfig):
         super().__init__(config)
-        if not config.api_key:
-            openai_api_key = "EMPTY"
+        if config.base_url:
+            openai_api_key = "EMPTY" if config.api_key is None else config.api_key
+            print(f"Using base_url: {config.base_url} and api_key: {openai_api_key}")
             self.client = OpenAI(
                 api_key=openai_api_key,
                 base_url=config.base_url,
             )
             models = self.client.models.list()
             print(f"Available models {models}")
-            self.config.model = models.data[0].id
+            # pick the model with the config.model
+            if config.model is None:
+                # pick the first available one
+                self.config.model = models.data[0].id
+            else:
+                # pick based on the name
+                self.config.model = next((model.id for model in models.data if config.model in model.id), None)
+            if self.config.model is None:
+                raise ValueError(f"Model {config.model} not found in {models}")
         else:
             self.client = OpenAI(api_key=config.api_key)
 
@@ -163,6 +173,9 @@ class CompletionAPI(BaseLLMAPI):
             print("========================(Prompt-completion-start)======================================")
             print(prompt)
             print("========================(Prompt-completion-end)======================================")
+            if self.config.is_thinking:
+                NOTHINK = "<think>\n\n</think>\n\n"
+                prompt = prompt + NOTHINK
             response = self.client.completions.create(
                 model=self.config.model,
                 prompt=prompt,
@@ -192,12 +205,16 @@ class CompletionAPI(BaseLLMAPI):
             # print(messages)
             print(messages[0]["content"])
             print("========================(Prompt-chat-end)======================================")
+            extra_body = {}
+            if self.config.is_thinking:
+                extra_body = {"chat_template_kwargs": {"enable_thinking": False}}
             response = self.client.chat.completions.create(
                 model=self.config.model,
                 messages=messages,
                 temperature=self.config.temperature,
                 max_tokens=self.config.max_tokens,
-                stop=stop
+                stop=stop,
+                extra_body=extra_body
             )
             completion = response.choices[0].message.content
             print("===========================(Response-chat-start)===================================")

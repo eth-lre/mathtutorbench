@@ -208,11 +208,9 @@ def evaluate_preference_accuracy(
 
     # Update results yaml file
     path = Path(args.data_path)
-    parts = path.stem.split('-')  # Split filename by '-'
-    model_name = parts[1]  # Extract model name
-    task_config_name = parts[2]  # Extract task config name
-
-    results_yaml_file = "../results/" + f"results-{model_name}.yaml"
+    stem = path.stem.removeprefix("generations-")
+    model_name, task_config_name = stem.rsplit("-", 1)
+    results_yaml_file = Path("./results") / f"results-{model_name}.yaml"
     with open(results_yaml_file, 'r') as f:
         data = yaml.safe_load(f)
 
