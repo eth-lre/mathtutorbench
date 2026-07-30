@@ -53,9 +53,37 @@ python main.py --tasks student_solution_correctness.yaml --provider gemini --mod
     - `model`: Model name to use for the task. Default is the first available model.
     - `api_key`: API key to access API. Empty for vllm models.
     - `is_chat`: Whether the requests to the model should use chat-based template (Chat Completion API). Default is False.
+    - `is_thinking`: Set to True for thinking/reasoning models (e.g. Qwen3) to disable thinking during generation. Default is False. In completion mode, an empty think block (`<think>\n\n</think>`) is appended to the prompt; in chat mode (`is_chat=True`), `chat_template_kwargs={"enable_thinking": False}` is sent to the server (supported by vllm).
     - `temperature`: Temperature for sampling. Default is 0.0.
     - `max_tokens`: Maximum tokens to generate. Default is 2048.
     - `max_retries`: Maximum retries for the API. Default is 3.
+  - Optional:
+    - `--output`: Output directory for the results. Default is `results`.
+    - `--debug`: Run only on a small subset of examples for debugging.
+
+### Examples for running each task
+Examples below use a local vllm model. Run the tasks of the Pedagogical Ability skill (`mistake_correction`, `scaffolding_generation`, `pedagogy_following`, `scaffolding_generation_hard`, `pedagogy_following_hard`) with `is_chat=True` by default, as they are dialog-based.
+```bash
+python main.py --tasks problem_solving.yaml --provider completion_api --model_args base_url=http://localhost:8000/v1,model=meta-llama/Llama-3.2-3B-Instruct
+python main.py --tasks socratic_questioning.yaml --provider completion_api --model_args base_url=http://localhost:8000/v1,model=meta-llama/Llama-3.2-3B-Instruct
+python main.py --tasks student_solution_correctness.yaml --provider completion_api --model_args base_url=http://localhost:8000/v1,model=meta-llama/Llama-3.2-3B-Instruct
+python main.py --tasks mistake_location.yaml --provider completion_api --model_args base_url=http://localhost:8000/v1,model=meta-llama/Llama-3.2-3B-Instruct
+python main.py --tasks mistake_correction.yaml --provider completion_api --model_args base_url=http://localhost:8000/v1,model=meta-llama/Llama-3.2-3B-Instruct,is_chat=True
+python main.py --tasks scaffolding_generation.yaml --provider completion_api --model_args base_url=http://localhost:8000/v1,model=meta-llama/Llama-3.2-3B-Instruct,is_chat=True
+python main.py --tasks pedagogy_following.yaml --provider completion_api --model_args base_url=http://localhost:8000/v1,model=meta-llama/Llama-3.2-3B-Instruct,is_chat=True
+python main.py --tasks scaffolding_generation_hard.yaml --provider completion_api --model_args base_url=http://localhost:8000/v1,model=meta-llama/Llama-3.2-3B-Instruct,is_chat=True
+python main.py --tasks pedagogy_following_hard.yaml --provider completion_api --model_args base_url=http://localhost:8000/v1,model=meta-llama/Llama-3.2-3B-Instruct,is_chat=True
+```
+
+### Using OpenRouter
+[OpenRouter](https://openrouter.ai/) exposes many models behind an OpenAI-compatible API, so it works with the `completion_api` provider. Set `base_url` to the OpenRouter endpoint, pass your OpenRouter API key, and use the full model name from OpenRouter (e.g. `anthropic/claude-sonnet-4.6`):
+```bash
+python main.py --tasks problem_solving.yaml --provider completion_api --model_args base_url=https://openrouter.ai/api/v1/,api_key=sk-XX,model=anthropic/claude-sonnet-4.6 --output results/ --debug
+```
+Remove `--debug` to run on the full dataset.
+
+> [!NOTE]
+> **Cost estimate**: Running the full benchmark via OpenRouter costs around $35 USD for non-reasoning models (e.g. Claude Sonnet 4.6) and can reach $100–200 USD for reasoning models due to the additional reasoning tokens. Use `--debug` first to verify your setup on a small subset before a full run.
 
 The performance of different benchmarked models averaged across tasks for Qwen2.5 family is as follows (using vllm version 0.8.0 on one node with 4x GH200 GPUs):
 
@@ -91,7 +119,7 @@ Results are available in the `results` folder. To visualize the results, run:
 python visualize.py --results_dir results/
 ```
 
-<img src="./images/figure2.png" alt="Skills" width="800">
+<img src="./images/radar_chart.png" alt="Radar chart comparing model performance across benchmark tasks" width="800">
 
 
 ## Installation
@@ -102,14 +130,27 @@ pip install -r requirements.txt
 ## Leaderboard
 | Model | Problem Solving | Socratic Questioning | Solution Correctness | Mistake Location | Mistake Correction | Scaffolding Win Rate | Pedagogy IF Win Rate | Scaffolding (Hard) | Pedagogy IF (Hard) |
 |--------|----------------|----------------------|----------------------|------------------|-------------------|------------------|-----------------|----------------|------------------|
-| LLaMA3.2-3B-Instruct | 0.60 | 0.29 | 0.67 | 0.41 | 0.13 | **0.64** | 0.63 | 0.45 | 0.40 |
+| LLaMA3.2-3B-Instruct | 0.60 | 0.29 | 0.67 | 0.41 | 0.13 | 0.64 | 0.63 | 0.45 | 0.40 |
 | LLaMA3.1-8B-Instruct | 0.70 | 0.29 | 0.63 | 0.29 | 0.09 | 0.61 | 0.67 | 0.46 | 0.49 |
 | LLaMA3.1-70B-Instruct | 0.91 | 0.29 | 0.71 | 0.56 | 0.19 | 0.63 | 0.70 | 0.49 | 0.49 |
-| GPT-4o | 0.90 | **0.48** | 0.67 | 0.37 | **0.84** | 0.50 | **0.82** | 0.46 | **0.70** |
-| LearnLM-1.5-Pro | **0.94** | 0.32 | **0.75** | **0.57** | 0.74 | **0.64** | 0.68 | **0.66** | 0.67 |
+| GPT-4o | 0.90 | **0.48** | 0.67 | 0.37 | 0.84 | 0.50 | 0.82 | 0.46 | 0.70 |
+| LearnLM-1.5-Pro | 0.94 | 0.32 | 0.75 | 0.57 | 0.74 | 0.64 | 0.68 | 0.66 | 0.67 |
 | Llemma-7B-ScienceTutor | 0.62 | 0.29 | 0.66 | 0.29 | 0.16 | 0.37 | 0.48 | 0.38 | 0.42 |
 | Qwen2.5-7B-SocraticLM | 0.73 | 0.32 | 0.05 | 0.39 | 0.23 | 0.39 | 0.39 | 0.28 | 0.28 |
 | Qwen2.5-Math-7B-Instruct | 0.88 | 0.35 | 0.43 | 0.47 | 0.49 | 0.06 | 0.07 | 0.05 | 0.05 |
+| apertus-ai/Apertus-v1.5-8B | 0.76 | 0.27 | 0.35 | 0.46 | 0.07 | 0.11 | 0.22 | 0.09 | 0.12 |
+| zai-org/GLM-4.7-Flash | 0.78 | 0.29 | 0.59 | 0.41 | 0.09 | 0.39 | 0.70 | 0.30 | 0.57 |
+| Qwen/Qwen3.6-27B | **0.97** | 0.28 | 0.80 | 0.71 | **0.89** | 0.57 | 0.78 | 0.62 | 0.78 |
+| google/gemini-2.5-pro (adaptive reasoning) | 0.88 | 0.30 | **0.86** | **0.72** | 0.59 | **0.67** | 0.53 | **0.69** | 0.67 |
+| eth-nlped/TutorRL-7B | 0.77 | 0.23 | 0.65 | 0.36 | 0.75 | 0.53 | 0.70 | 0.55 | 0.66 |
+| anthropic/claude-sonnet-4.6 | 0.91 | 0.32 | 0.80 | 0.55 | 0.79 | 0.49 | **0.85** | 0.53 | **0.80** |
+
+> [!NOTE]
+> All models are evaluated with thinking/reasoning **disabled** (see the `is_thinking` model argument). The only exception is `google/gemini-2.5-pro`, which uses its default adaptive thinking (thinking budget set to `-1`).
+
+Averaging the subtasks into the three high-level teacher skills — Math Expertise (problem solving, socratic questioning), Student Understanding (solution correctness, mistake location, mistake correction) and Pedagogy (the four win rates) — shows that strong problem solvers are not automatically strong tutors:
+
+<img src="./images/skills_scatter.png" alt="Scatter of Student Understanding vs Pedagogy, colored by Math Expertise" width="700">
 
 
 ## Submit your model to leaderboard
@@ -147,6 +188,7 @@ Please cite as:
     doi = "10.18653/v1/2025.emnlp-main.11",
     pages = "204--221",
     ISBN = "979-8-89176-332-6",
+}
 ```
 
 This work is licensed under a
