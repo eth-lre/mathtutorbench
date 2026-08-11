@@ -230,7 +230,8 @@
         Mistake Location: micro-F1 · Mistake Correction: accuracy · remaining columns: reward-model win rate.
         Models marked <span class="tag-new" style="margin-left:0">NEW</span> were added after the paper's release.</p>
     <p class="table-note">All models are evaluated with thinking/reasoning <strong>disabled</strong>
-        (<code>is_thinking</code> option). The only exception is <code>google/gemini-2.5-pro</code>, which uses its
+        (<code>is_thinking</code> option). The only exceptions are <code>google/gemini-2.5-pro</code>,
+        <code>google/gemini-3.1-pro</code> and <code>google/gemini-3.6-flash</code>, which use their
         default adaptive thinking (thinking budget set to <code>-1</code>).</p>
 </section>
 
@@ -412,6 +413,9 @@ python main.py --tasks problem_solving.yaml --provider completion_api --model_ar
         { name: 'google/gemini-2.5-pro (adaptive reasoning)', isNew: true, scores: [0.88, 0.30, 0.86, 0.72, 0.59, 0.67, 0.53, 0.69, 0.67] },
         { name: 'eth-nlped/TutorRL-7B',       isNew: true,  scores: [0.77, 0.23, 0.65, 0.36, 0.75, 0.53, 0.70, 0.55, 0.66] },
         { name: 'anthropic/claude-sonnet-4.6', isNew: true, scores: [0.91, 0.32, 0.80, 0.55, 0.79, 0.49, 0.85, 0.53, 0.80] },
+        { name: 'google/gemini-3.1-pro (default adaptive reasoning)', isNew: true, scores: [0.97, 0.36, 0.89, 0.81, 0.93, 0.73, 0.73, 0.76, 0.73] },
+        { name: 'google/gemini-3.6-flash (default adaptive reasoning)', isNew: true, scores: [0.98, 0.34, 0.88, 0.80, 0.91, 0.69, 0.72, 0.69, 0.76] },
+        { name: 'Qwen/Qwen2.5-7B-Instruct',  isNew: true,  scores: [0.85, 0.19, 0.64, 0.49, 0.52, 0.44, 0.40, 0.42, 0.44] },
     ];
 
     const NUM_COLS = 9;

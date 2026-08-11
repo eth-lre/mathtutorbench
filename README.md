@@ -140,13 +140,16 @@ pip install -r requirements.txt
 | Qwen2.5-Math-7B-Instruct | 0.88 | 0.35 | 0.43 | 0.47 | 0.49 | 0.06 | 0.07 | 0.05 | 0.05 |
 | apertus-ai/Apertus-v1.5-8B | 0.76 | 0.27 | 0.35 | 0.46 | 0.07 | 0.11 | 0.22 | 0.09 | 0.12 |
 | zai-org/GLM-4.7-Flash | 0.78 | 0.29 | 0.59 | 0.41 | 0.09 | 0.39 | 0.70 | 0.30 | 0.57 |
-| Qwen/Qwen3.6-27B | **0.97** | 0.28 | 0.80 | 0.71 | **0.89** | 0.57 | 0.78 | 0.62 | 0.78 |
-| google/gemini-2.5-pro (adaptive reasoning) | 0.88 | 0.30 | **0.86** | **0.72** | 0.59 | **0.67** | 0.53 | **0.69** | 0.67 |
+| Qwen/Qwen3.6-27B | 0.97 | 0.28 | 0.80 | 0.71 | 0.89 | 0.57 | 0.78 | 0.62 | 0.78 |
+| google/gemini-2.5-pro (adaptive reasoning) | 0.88 | 0.30 | 0.86 | 0.72 | 0.59 | 0.67 | 0.53 | 0.69 | 0.67 |
 | eth-nlped/TutorRL-7B | 0.77 | 0.23 | 0.65 | 0.36 | 0.75 | 0.53 | 0.70 | 0.55 | 0.66 |
 | anthropic/claude-sonnet-4.6 | 0.91 | 0.32 | 0.80 | 0.55 | 0.79 | 0.49 | **0.85** | 0.53 | **0.80** |
+| google/gemini-3.1-pro (default adaptive reasoning) | 0.97 | 0.36 | **0.89** | **0.81** | **0.93** | **0.73** | 0.73 | **0.76** | 0.73 |
+| google/gemini-3.6-flash (default adaptive reasoning) | **0.98** | 0.34 | 0.88 | 0.80 | 0.91 | 0.69 | 0.72 | 0.69 | 0.76 |
+| Qwen/Qwen2.5-7B-Instruct | 0.85 | 0.19 | 0.64 | 0.49 | 0.52 | 0.44 | 0.40 | 0.42 | 0.44 |
 
 > [!NOTE]
-> All models are evaluated with thinking/reasoning **disabled** (see the `is_thinking` model argument). The only exception is `google/gemini-2.5-pro`, which uses its default adaptive thinking (thinking budget set to `-1`).
+> All models are evaluated with thinking/reasoning **disabled** (see the `is_thinking` model argument). The only exceptions are the `google/gemini-2.5-pro`, `google/gemini-3.1-pro` and `google/gemini-3.6-flash` models, which use their default adaptive thinking (thinking budget set to `-1`).
 
 Averaging the subtasks into the three high-level teacher skills — Math Expertise (problem solving, socratic questioning), Student Understanding (solution correctness, mistake location, mistake correction) and Pedagogy (the four win rates) — shows that strong problem solvers are not automatically strong tutors:
 
