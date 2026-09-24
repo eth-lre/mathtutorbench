@@ -163,6 +163,23 @@ To submit your model to the leaderboard, please follow the steps below:
 1. Open a new issue with the title `Leaderboard Submission: <Model Name>`.
 2. Provide the exact model name on the Huggingface hub and if specific code/arguments/settings are needed for the model or the vllm library which will be used to run your model. Please copy the results from the local run of the model.
 
+## Submit a system to the systems leaderboard
+
+The leaderboard above evaluates *models*. A complete tutoring system, a product,
+an agentic workflow or a prompt chain, is evaluated separately: it may call
+several models, use external tools, and hold information a leaderboard model
+never sees, so the two numbers are not comparable and are not ranked together.
+
+Expose your system behind an OpenAI-compatible endpoint and run:
+
+```bash
+python submit_system.py --endpoint http://127.0.0.1:8777/v1 --model my-system \
+    --manifest systems/my-system.yaml --score
+```
+
+See [SYSTEMS.md](SYSTEMS.md) for the rules and
+`systems/manifest.template.yaml` for the declaration each submission carries.
+
 ## Adding a New Task
 Please open a new PR and provide the configuration of the task in the `configs` folder and the task implementation in the `tasks` folder.
 

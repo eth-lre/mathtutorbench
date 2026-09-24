@@ -1,0 +1,100 @@
+# Vulpi, first entry on the systems leaderboard.
+#
+# A French maths tutoring product for secondary school students, used in
+# production. Exposed to the harness behind an OpenAI-compatible endpoint, with
+# the tutor prompt it runs for real students.
+#
+# Everything below is declared because it weakens or qualifies the numbers. If
+# this file reads as a list of reasons to distrust the row, it is doing its job.
+
+system_name: "Vulpi"
+system_url: "https://vulpi.education"
+contact: "matbila63@gmail.com"
+
+# One model for every role. No ensembling, no model diversity, no reranking.
+models:
+  - "z-ai/glm-5.2 (via OpenRouter)"
+
+# Measured over the 2954 items of the run. Two calls is the floor: a private
+# solver, then the tutor turn. The rest are corrections, counted below in notes.
+llm_calls_per_item_mean: 2.09
+llm_calls_per_item_max: 4
+
+# The task instruction, including the LearnLM-style prompt of pedagogy_following,
+# is discarded. Vulpi applies its production tutor prompt instead. Only the
+# Problem and Conversation fields are parsed out. This is the honest answer and
+# it is what collapses each task pair into a single experiment.
+task_instruction_honored: false
+
+reads_any_gold_field: false
+
+external_tools:
+  - "SymPy, as a symbolic verification layer between and after the model calls"
+
+samples_per_item: 1
+temperature: 0.0      # private solver; the tutor turn runs at 0.3, see notes
+seed: null            # generation was not seeded; set_seed(42) applies to scoring
+
+full_test_set: true
+
+# Run with the private solver and the symbolic rail disabled, so the system sees
+# only the problem and the dialogue, as a leaderboard model does.
+ablation_no_tools:
+  scaffolding_generation: 0.853
+  scaffolding_generation_hard: null
+  items: 150
+  notes: >
+    Measured on a 150-item subset, where the full system scored 0.920 against
+    0.810 on the complete set. Subset numbers run optimistic, so read the gap
+    (0.920 to 0.853) rather than either figure on its own. A measurable part of
+    the margin is therefore an information advantage and not a pedagogical one.
+    To be re-run on the full 1150 before this row is treated as final.
+
+notes: >
+  Results: scaffolding_generation 0.810 (n=1150), pedagogy_following 0.809
+  (n=1150), scaffolding_generation_hard 0.789 (n=327), pedagogy_following_hard
+  0.777 (n=327). Full test sets, no subsampling, single pass, no retries, no
+  empty generations, zero request failures.
+
+  TWO TASKS, NOT FOUR. Because the task instruction is replaced, the two runs of
+  a pair receive byte-identical input. 0.810 against 0.809, and 0.789 against
+  0.777, are therefore a test-retest estimate rather than two independent tasks,
+  and they do say something useful: run-to-run noise is small. Any claim of
+  consistency across four tasks built on this row would be inflated.
+
+  CALL BREAKDOWN. Two calls per item at the floor: a private solver at
+  temperature 0.0 with reasoning disabled, which emits a machine-checkable
+  [[FACTS]] block, then the tutor turn at temperature 0.3, streamed, whose system
+  prompt carries the solver's solution and a SymPy verification report.
+  Deterministic non-LLM SymPy layers sit between and after them. Over 2954 items
+  the extra calls were: 217 (7.3%) where the solver omitted the FACTS block and
+  was re-run with full reasoning, 52 (1.8%) where SymPy found a false fact and
+  triggered a corrective re-solve, 6 (0.2%) where the tutor's own utterance
+  contained a SymPy-refutable claim and was regenerated once. About 6183 calls in
+  total.
+
+  LATENCY HEDGE. The production streaming path opens a second call if no text has
+  arrived after 12 seconds and serves whichever speaks first. It is a tail-latency
+  guard, not a quality selection, but it does mean a small number of served turns
+  are the first of two draws rather than a single clean draw. Declared here rather
+  than left to be found in the adapter.
+
+  NOT THE WHOLE PRODUCT. Three production components are bypassed as inapplicable:
+  curriculum mapping (it maps onto the French national curriculum, and these
+  problems are American), student memory, and lesson planning. What is measured is
+  the tutoring engine, not the product.
+
+  LANGUAGE. One instruction is appended to the production prompt, telling the
+  tutor to answer in English. Vulpi is a French product; without it the run would
+  measure a language penalty rather than pedagogy.
+
+  JUDGE-SIDE CONFOUND. Our turns average 166 characters against 100 for the human
+  reference turns, which are raw chat with typos. Length and surface polish have
+  not been controlled for in a 1.5B pairwise judge, and this row should not be
+  read as free of that.
+
+  LATENCY NOT INSTRUMENTED. The original run predates submit_system.py and did not
+  time individual requests; wall clock was roughly 2 hours for the four tasks in
+  parallel against a single adapter instance. To be filled in on a re-run. For
+  context, production measures a median of 14.9s to the tutor's first word and a
+  p90 around 33s, measured separately in the browser.

@@ -1,0 +1,61 @@
+# Systems leaderboard: submission manifest.
+#
+# Copy to systems/<your-system>.yaml, fill it in, pass it to submit_system.py
+# with --manifest. Every field is required. Each one exists because it can move
+# a published number without being visible in the number itself.
+
+system_name: ""
+system_url: ""
+contact: ""
+
+# Every model the system may call, by name, including the small ones used for
+# routing, reranking or judging. "One model, called twice" is an answer.
+models: []
+
+# Measured over the run, not estimated. A system that calls a model once per
+# item and one that calls it nine times are not doing the same thing, even at
+# the same score.
+llm_calls_per_item_mean: null
+llm_calls_per_item_max: null
+
+# Does the system use the task instruction from configs/*.yaml, or replace it
+# with its own prompt? Replacing is allowed and often unavoidable for a product,
+# but it collapses the two tasks that share a dataset into one experiment, so it
+# has to be declared. submit_system.py checks this empirically and will
+# contradict you if the check can.
+task_instruction_honored: null
+
+# reference_solution and the other gold fields are the scoring ground truth.
+# Reading them at any point, for any purpose, makes the result meaningless.
+# This must be false.
+reads_any_gold_field: false
+
+# Solvers, retrievers, calculators, search, symbolic checkers, anything outside
+# the model. Name them.
+external_tools: []
+
+samples_per_item: 1
+temperature: 0.0
+seed: null
+
+# false if you subsampled. If you did, say how many items per task in notes.
+full_test_set: true
+
+# Required. Re-run the system with its external tools and any private solver
+# disabled, so it sees only what a leaderboard model sees: the problem and the
+# dialogue. Report the score. The gap between the two is how much of the margin
+# is an information advantage rather than a pedagogical one, and it is the
+# single most useful number a systems submission can carry.
+#
+# Subsample if the full set is too expensive, and say so. Subset scores tend to
+# run optimistic, so report the subset size next to them.
+ablation_no_tools:
+  scaffolding_generation: null
+  scaffolding_generation_hard: null
+  items: null
+  notes: ""
+
+# Caveats you would want attached to your row if someone quoted it in a paper.
+# Write the ones that weaken your number: those are the ones a reader cannot
+# find on their own.
+notes: ""

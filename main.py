@@ -49,6 +49,9 @@ def main():
                         help='Output directory for results')
     parser.add_argument('--debug', action='store_true',
                       help='Enable debug logging')
+    parser.add_argument('--limit', type=int, default=0,
+                      help='Evaluate only the first N examples per task (0 = full test set). '
+                           'Useful for a smoke run before paying for a full one.')
     args = parser.parse_args()
 
     # Parse model arguments
@@ -78,7 +81,11 @@ def main():
         all_generations = []
 
         # Process examples
-        for example in tqdm(task.get_test_examples(), desc=f"Evaluating {task_config.name}"):
+        examples = task.get_test_examples()
+        if args.limit:
+            print(f"--limit: {args.limit} of {len(examples)} examples")
+            examples = examples[:args.limit]
+        for example in tqdm(examples, desc=f"Evaluating {task_config.name}"):
             # Prepare messages with few-shot examples if provided
             messages = []
             example["shots"] = task_config.few_shot_samples
